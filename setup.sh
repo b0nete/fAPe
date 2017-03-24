@@ -21,3 +21,6 @@ select yn in "Yes" "No"; do
 		No ) break;;
 	esac
 done
+
+#Abrir fAPe
+python3.6 fAPe.py
