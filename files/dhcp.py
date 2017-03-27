@@ -5,25 +5,25 @@ from . import main
 
 #Functions
 
-def MainPrimary():
-		print('''
-1 - Configuracion AUTOMATICA
-2 - Configuracion MANUAL
-3 - Menu Principal
-''')
-
-		keyC = input()
-
-		if keyC == "1":
-			AUTOconfigDHCPSERVER()
-			AUTOconfigDHCPD()
-			main.MainPrimary()
-		elif keyC == "2":
-			MENUconfigDHCP()
-		elif keyC == "3":
-			main.MainOptions()
-		else:
-			os.system('exit')
+#def MainPrimary():
+#		print('''
+#1 - Configuracion AUTOMATICA
+#2 - Configuracion MANUAL
+#3 - Menu Principal
+#''')
+#
+#		keyC = input()
+#
+#		if keyC == "1":
+#			AUTOconfigDHCPSERVER()
+#			AUTOconfigDHCPD()
+#			main.MainPrimary()
+#		elif keyC == "2":
+#			MENUconfigDHCP()
+#		elif keyC == "3":
+#			main.MainOptions()
+#		else:
+#			os.system('exit')
 #--#
 
 def AUTOconfigDHCPSERVER():
@@ -66,11 +66,7 @@ max-lease-time 1814400;
 	os.system('service isc-dhcp-server restart')
 #--#
 
-def MANUALconfigDHCPSERVER():
-	#Definir interfaz FAKEAP
-	print('Indique la interfaz que va a funcionar de FAKE AP (eth*, wlan*)')
-	VARiface = input()
-
+def MANUALconfigDHCPSERVER(VARiface):
 	#Configurar isc-dhcp-server
 	dhcpsvFILE = open('/etc/default/isc-dhcp-server', 'w')
 	dhcpsvFILE.write('INTERFACES=' + VARiface)
@@ -78,20 +74,9 @@ def MANUALconfigDHCPSERVER():
 
 	#Reiniciar servicio
 	os.system('service isc-dhcp-server restart')
-
-	#Voler a menu auto.
-	MENUconfigDHCP()
 #--#
 
-def MANUALconfigDHCPD():
-	#Variables
-	print('''Introduzca la direccion de red privada que va a utiliza para su servidor DHCP (sin octeto de hosts)
-Ej: 192.168.1''')
-	VARnet = input() #Red
-	print('''Introduzca la mascara de la subred indicada anteriormente
-Ej: 255.255.255.0''')
-	VARmask = input() #Mascara
-
+def MANUALconfigDHCPD(VARnet, VARmask):
 	#Configurar dhcpd.conf
 	dhcpconfFILE = open('/etc/dhcp/dhcpd.conf', 'w')
 	strDHCP = '''ddns-update-style none;
@@ -103,7 +88,7 @@ subnet
 # --- default gateway
 option routers @VARnet.1;
 # --- Netmask
-option subnet-mask 255.255.255.0;
+option subnet-mask @VARmask;
 # --- Broadcast Address
 option broadcast-address
 @VARnet.255;
@@ -115,14 +100,12 @@ default-lease-time 1209600;
 max-lease-time 1814400;
 }'''
 	strDHCP2 = strDHCP.replace('@VARnet', VARnet)
-	dhcpconfFILE.write(strDHCP2)
+	strDHCP3 = strDHCP2.replace('@VARmask', VARmask)
+	dhcpconfFILE.write(strDHCP3)
 	dhcpconfFILE.close()
 
 	#Reiniciar servicio
 	os.system('service isc-dhcp-server restart')
-
-	#Voler a menu auto.
-	MENUconfigDHCP()
 #--#
 
 def MENUconfigDHCP():
