@@ -32,14 +32,22 @@ def stopServicesConflict():
 def AUTOconfigHOSTAPD():
 	#Iniciar Hostapd
 	stopServicesConflict()
-	shareINET()
+	shareINETAUTO()
+	#Set hostapd
+	hostapdFILE = open('configs/hostapd.conf', 'w')
+	strHOSTAPD = '''#Settings Hostapd
+interface=wlan0
+driver=nl80211
+ssid=fAPe
+channel=1'''
+	hostapdFILE.write(strHOSTAPD)
+	hostapdFILE.close() 
 	os.system('hostapd configs/hostapd.conf')
 #--#
 
 
 def MANUALconfigHOSTAPD(VARssid, VARchannel):
 	stopServicesConflict()
-	shareINET()
 
 	#Set hostapd
 	hostapdFILE = open('configs/hostapd.conf', 'w')
@@ -47,16 +55,17 @@ def MANUALconfigHOSTAPD(VARssid, VARchannel):
 interface=wlan0
 driver=nl80211
 ssid=@VARssid
-channel=@VARchannel
-}'''
+channel=@VARchannel'''
 	strHOSTAPD2 = strHOSTAPD.replace('@VARssid', VARssid)
 	strHOSTAPD3 = strHOSTAPD2.replace('@VARchannel', VARchannel)
 	hostapdFILE.write(strHOSTAPD3)
-	hostapdFILE.close()
- 
+	hostapdFILE.close() 
 #--#
 
-def shareINET():
+def goHOSTAPD():
+	os.system('hostapd configs/hostapd.conf')
+
+def shareINETAUTO():
 	os.system('echo 1 > /proc/sys/net/ipv4/ip_forward')
 	os.system('iptables -A FORWARD -i wlan0 -j ACCEPT')
 	os.system('iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE')

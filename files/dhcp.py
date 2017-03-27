@@ -84,7 +84,7 @@ ignore client-updates;
 authoritative;
 option local-wpad code 252 = text;
 subnet
-@VARnet netmask 255.255.255.0 {
+@VARnet.0 netmask 255.255.255.0 {
 # --- default gateway
 option routers @VARnet.1;
 # --- Netmask
