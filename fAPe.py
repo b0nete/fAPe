@@ -1,86 +1,9 @@
 #Libs
 import os
+from files import main
 #import netifaces
 
-#Banner
-print("""
-                                   
-@@@@@@@@   @@@@@@   @@@@@@@   @@@@@@@@  
-@@@@@@@@  @@@@@@@@  @@@@@@@@  @@@@@@@@  
-@@!       @@!  @@@  @@!  @@@  @@!       
-!@!       !@!  @!@  !@!  @!@  !@!       
-@!!!:!    @!@!@!@!  @!@@!@!   @!!!:!    
-!!!!!:    !!!@!!!!  !!@!!!    !!!!!:    
-!!:       !!:  !!!  !!:       !!:       
-:!:       :!:  !:!  :!:       :!:       
- ::       ::   :::   ::        :: ::::  
- :         :   : :   :        : :: ::   
-                                                
-""")
-
-##Funciones
-
-#Menu Principal
-def Main():
-	os.system('clear')
-	
-	print ("""
-	1 - Configurar DHCP
-	2 - Configurar Hostapd
-	3 - Ejecutar fAPe
-	""")
-
-	keyb = input()
-
-	if keyb == "1":
-		print("CONFIGURANDO DHCP")
-
-	elif keyb == "2":
-		print("CONFIGURANDO HOSTAPD")
-
-	elif keyb == "3":
-		print("AUTOMATICO")
-		setIPFAKEAP()
-		configDHCP()
-		stopServicesConflict()
-		shareINET()
-		goHOSTAPD()
-	else:
-		print("CERRANDO")
-		
-def configDHCP():
-	#Configurar isc-dhcp-server
-	dhcpsvFILE = open('/etc/default/isc-dhcp-server', 'w')
-	dhcpsvFILE.write('INTERFACES=wlan0')
-	dhcpsvFILE.close()
-
-	#Configurar dhcpd.conf
-	dhcpconfFILE = open('/etc/dhcp/dhcpd.conf', 'w')
-	dhcpconfFILE.write(
-	'''ddns-update-style none;
-ignore client-updates;
-authoritative;
-option local-wpad code 252 = text;
-subnet
-192.168.2.0 netmask 255.255.255.0 {
-# --- default gateway
-option routers 192.168.2.1;
-# --- Netmask
-option subnet-mask 255.255.255.0;
-# --- Broadcast Address
-option broadcast-address
-192.168.2.255;
-# --- Domain name servers, tells the clients which DNS servers to use.
-option domain-name-servers 8.8.8.8, 8.8.4.4;
-option time-offset 0;
-range 192.168.2.100 192.168.2.200;
-default-lease-time 1209600;
-max-lease-time 1814400;
-}''')
-	dhcpconfFILE.close()
-
-	#Reiniciar servicio
-	os.system('service isc-dhcp-server restart')
+#Functions
 
 def stopServicesConflict():
 	os.system('/etc/init.d/network-manager stop')
@@ -98,15 +21,15 @@ def shareINET():
 	os.system('iptables -A FORWARD -i wlan0 -j ACCEPT')
 	os.system('iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE')
 
+####################################################################################################
+
+#Code
+main.MainOptions()
 
 
 
 
 ####################################################################################################
-
-#Configuracion
-print("")
-Main()
 
 #os.system('lsusb')
 #print("List interfaces availables for create your fake AP")
